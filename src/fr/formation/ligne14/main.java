@@ -11,11 +11,11 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Line line = buildLine("Ligne 14");
-		List<Station> stations = buildStations(line, "S1", "S2", "S3", "S4", "S5");
+		List<Station> stations = buildStations(line, "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9");
 		List<Journey> journeys = buildJourneys(5, stations);
 		System.out.println(stations.toString());
 		System.out.println(journeys.toString());
-		Integer durationFinal = showDuration("S3", "S1", journeys);
+		Integer durationFinal = showDuration("S9", "S1", journeys);
 		System.out.println("------DURATION FINAL------" + durationFinal.toString() + " mins");
 	}
 
