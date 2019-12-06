@@ -10,13 +10,17 @@ public class main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		// Creation de la ligne
 		Line line = buildLine("Ligne 14");
-		List<Station> stations = buildStations(line, "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9");
+		// Insertion des stations de la ligne
+		List<Station> stations = buildStations(line, "Saint-Lazare", "Madeleine", "Pyramides", "Chatelet",
+				"Gare de Lyon", "Bercy", "Cour Saint-Emilion", "Bibliotheque François-Mitterrand", "Olympiades");
+		// Initialisation de la durée entre les stations
 		List<Journey> journeys = buildJourneys(5, stations);
-		System.out.println(stations.toString());
-		System.out.println(journeys.toString());
-		Integer durationFinal = showDuration("S9", "S1", journeys);
-		System.out.println("------DURATION FINAL------" + durationFinal.toString() + " mins");
+		String saisiDepart = "Bercy";
+		String saisiArrivee = "Madeleine";
+		int durationFinal = showDuration(saisiDepart, saisiArrivee, journeys, stations);
+		System.out.println("La durée du trajet entre la station "+ saisiDepart +" et la station "+ saisiArrivee + " est de " + durationFinal + " mins");
 	}
 
 	public static Line buildLine(String name) {
@@ -27,14 +31,14 @@ public class main {
 	}
 
 	public static List<Station> buildStations(Line line, String... names) {
-		List<Station> L = new ArrayList<Station>();
+		List<Station> list = new ArrayList<Station>();
 		for (String name : names) {
 			Station station = new Station();
 			station.setLine(line);
 			station.setName(name);
-			L.add(station);
+			list.add(station);
 		}
-		return L;
+		return list;
 	}
 
 	public static List<Journey> buildJourneys(Integer duration, List<Station> ls) {
@@ -54,64 +58,63 @@ public class main {
 		return journeyList;
 	}
 
-	public static Integer showDuration(String stationOrigin, String stationArrival, List<Journey> list) {
-		Boolean rec = false;
-		Integer durationFinal = 0;
-		String sOrigin = stationOrigin;
-		String sArriv = stationArrival;
-		List<Journey> ls = list;
+	public static int showDuration(String stationOrigin, String stationArrival, List<Journey> list,
+			List<Station> stations) {
+		boolean include = false;
+		int durationFinal = 0;
+		Station beginStation = null;
+		Station endStation = null;
+		List<Journey> listOfJourneys = list;
+		List<Station> listOfStations = stations;
 
-		int posDeparture = -1;
-		int posArrival = -1;
-
-		for (int i = 0; i < ls.size(); i++) {
-
-			if (ls.get(i).getDeparture().getName() == sOrigin) {
-				posDeparture = i;
+		for (Station station : listOfStations) {
+			if (station.getName() == stationOrigin) {
+				beginStation = station;
 			}
-			if (ls.get(i).getDeparture().getName() == sArriv) {
-				posArrival = i;
+			if (station.getName() == stationArrival) {
+				endStation = station;
 			}
-
-		}
-		if (posDeparture == -1 && (ls.get(ls.size() - 1).getArrival().getName() == sOrigin)) {
-			posDeparture = ls.size() - 1;
-		}
-		if (posArrival == -1 && (ls.get(ls.size() - 1).getArrival().getName() == sArriv)) {
-			posArrival = ls.size() - 1;
 		}
 
-		System.out.println("first : " + posDeparture + " second : " + posArrival);
+		int posDeparture = stations.indexOf(beginStation);
+		int posArrival = stations.indexOf(endStation);
+		boolean reverse = false;
+
+		//System.out.println("first : " + posDeparture + " second : " + posArrival);
 
 		if (posDeparture == -1 || posArrival == -1) {
-			durationFinal = 0;
+			return durationFinal = 0;
 		} else if (posDeparture > posArrival) {
-			sOrigin = stationArrival;
-			sArriv = stationOrigin;
-			Collections.reverse(ls);
-			for (int i = 0; i < ls.size(); i++) {
-				if (ls.get(i).getArrival().getName() == stationOrigin) {
-					rec = true;
+
+			reverse = true;
+			Collections.reverse(listOfJourneys);
+
+		}
+
+		for (Journey journey : listOfJourneys) {
+			if (reverse) {
+				if (journey.getArrival().equals(beginStation) || include) {
+					include = true;
 				}
-				if ((rec) && (ls.get(i).getArrival().getName() != stationArrival)) {
-					durationFinal = durationFinal + ls.get(i).getDuration();
+				if ((include) && (!journey.getArrival().equals(endStation))) {
+					durationFinal = durationFinal + journey.getDuration();
 				} else {
-					rec = false;
+					include = false;
 				}
-			}
-		} else {
-			for (int i = 0; i < ls.size(); i++) {
-				if (ls.get(i).getDeparture().getName() == stationOrigin) {
-					rec = true;
+
+			} else {
+				if (journey.getDeparture().equals(beginStation)) {
+					include = true;
 				}
-				if ((rec) && (ls.get(i).getDeparture().getName() != stationArrival)) {
-					durationFinal = durationFinal + ls.get(i).getDuration();
+				if ((include) && (!journey.getDeparture().equals(endStation))) {
+					durationFinal = durationFinal + journey.getDuration();
 				} else {
-					rec = false;
+					include = false;
 				}
 			}
 		}
-		System.out.println(ls);
+
+		//System.out.println(listOfJourneys);
 		return durationFinal;
 	}
 
